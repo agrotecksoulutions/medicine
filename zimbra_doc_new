@@ -1,0 +1,313 @@
+###Deleting mails from specific ID 
+/opt/zimbra/postfix/sbin/mailq |grep newsletter@carnivalcinemas.com |awk {'print $1'} |grep -v @ | tr -d '*!'|/opt/zimbra/postfix/sbin/postsuper -d -
+/opt/zimbra/postfix/sbin/mailq |grep MAILER-DAEMON |awk {'print $1'} |grep -v @ | tr -d '*!'|/opt/zimbra/postfix/sbin/postsuper -d -
+614C8D4E004!  107270 Sat Feb  3 19:11:47  MAILER-DAEMON
+                    (connect to 10.10.1.109[10.10.1.109]:25: No route to host)
+                                         aero.info@woodlandworldwide.com
+
+URL : http://webmail.i2k2.com
+Username: support/support1
+Password: lOginsuppOrt1234
+
+Email id: maurya@i2k2.com
+Password: $@#$EFFS%$#%$%
+
+###Account creation 
+ zmprov ca shashank.kawle@prudentbrokers.com 'ASDd@#@e3@1234@' title 'Senior Executive' l 'Mumbai' givenName 'hashank Kawle' sn 'Kawle ' displayName 'Prudent - Shashank Kawle' telephoneNumber '9004374447'
+
+ca raipur2.delvoice@delcure.co.in Delcure@123 displayName 'Ashish Kumar Verma' zimbraHideInGal TRUE zimbraMailQuota 20971520 zimbraPasswordMaxAge 7 
+##DL creation 
+zmprov cdl ASME@prudentbrokers.com displayName 'ASM Enterprise' desrciption 'Branch: Bangalore'
+
+#mailbox size
+zmmailbox -z -m rcjain-old@grinfra.com  gms
+zmmailbox -z -m rcjain-old@grinfra.com  gaf
+zmprov gqu `zmhostname`
+zimbra@mail ~]$ zmprov getMailboxInfo  itsoftware05@abcdefghi.rvsolutions.in
+mailboxId: 1218
+quotaUsed: 14496
+
+
+##checking spamming
+grep sasl_user /var/log/maillog | sed 's/.*sasl_username=//g' | sort | uniq -c | sort -nr | head 
+
+##Mailq Queue  Status
+[root@mta001 ~]# /opt/zimbra/libexec/zmqstat
+hold=0
+corrupt=0
+deferred=1
+active=0
+incoming=0
+Forwarding get commands:
+zmprov -l gaa -v | egrep '# name|zimbraPrefMailForwardingAddress' | grep -B 1 zimbraPrefMailForwardingAddress --->>>
+zmprov -l gaa -v | egrep '# name|zimbraMailForwardingAddress' | grep -v Max | grep -B 1 zimbraMailForwardingAddress
+
+
+
+###Viewing Mail Header 
+/opt/zimbra/postfix/sbin/postcat -q 58DB780F8F4
+
+
+##Requeue Messages In Postfix
+/opt/zimbra/postfix/sbin/postsuper -r ALL
+##
+###To put all messages on hold
+ /opt/zimbra/postfix/sbin/postsuper -h ALL active
+
+##To put a message on hold:
+/opt/zimbra/postfix/sbin/postsuper -h EC753D0D00n
+
+To Delete ALL Messages From The Deferred/active  Queue
+
+/opt/zimbra/postfix/sbin/postsuper -d ALL deferred/active 
+
+To Delete ALL Messages From The Hold Queue
+
+/opt/zimbra/postfix/sbin/postsuper -d ALL hold
+
+/opt/zimbra/postfix/sbin/postcat -q EC753D0D00
+
+# su - zimbra
+$ postconf message_size_limit
+message_size_limit = 10240000
+
+This configuration parameter is stored in the zimbra ldap directory, and propagated to postconf's message_size_limit by zmmtaconfig, which is invoked by the zimbra postfix command. The following commands will set the message_size_limit to 2MB (adjust this value to suit your needs):
+
+# su - zimbra
+$ zmprov modifyConfig zimbraMtaMaxMessageSize 2048000
+$ postfix reload
+
+You can then confirm the changes with this command:
+
+
+$ postconf | grep message_size_limit
+
+zmprov mcf zimbraMtaMaxMessageSize 18874368  (postconf | grep message_size_limit)r
+zmprov mcf zimbraFileUploadMaxSize  18874368
+zmprov mcf zimbraMailContentMaxSize  18874368
+
+
+To reindex a particular user’s mailbox.
+# su - zimbra # zmprov rim username start # zmprov rim username status
+###Making free space 
+[zimbra@mta001 msg]$ pwd
+/var/spool/snfilter/msg
+[zimbra@mta001 msg]$ rm -rf *1*
+
+     
+#Blocking/Allowing  attachment extention:
+zmprov gcf zimbraMtaBlockedExtension |grep  -i xlsm
+zmprov mcf -zimbraMtaBlockedExtension XLSM
+zmprov mcf +zimbraMtaBlockedExtension XLSM
+##DKIM verification
+zmprov gcf zimbraAmavisEnableDKIMVerification
+Distribution list:
+Adding member:
+zmprov adlm aceller@prudentbrokers.com atul.patil@prudentbrokers.com
+
+zmprov  adlm groupID ID
+
+Contents
+
+    1 Track messages sent and received by a user
+        1.1 Purpose
+        1.2 Resolution
+        1.3 Additional Content
+
+Track messages sent and received by a user
+   KB 21853        	Last updated on 07/13/2015   	Last updated by Jorge de la Cruz 	
+0.00
+(0 votes)
+	Verified in:
+ZCS 8.6 Article ZCS 8.6ZCS 8.5 Article ZCS 8.5ZCS 8.0 Article ZCS 8.0
+
+{{{5}}}
+	
+
+
+
+
+Article-check.png  - This is certified documentation and is protected for editing by Zimbra Employees & Moderators only.
+ - This article is a Work in Progress, and may be unfinished or missing sections.
+Purpose
+
+###############Track messages sent and received by a user
+Resolution
+
+'zmmsgtrace' can be used for this. This parses the logs by showing only the sender and receiver, and the time the email was sent.
+
+Simply running '/opt/zimbra/libexec/zmmsgtrace' shows the logs for all the users.
+
+Using '-s' shows all the emails sent by 'user@example.com' :
+
+/opt/zimbra/libexec/zmmsgtrace -s user@example.com
+
+'-r' sorts emails by the receiver. So for the emails sent to 'gmail.com':
+
+/opt/zimbra/libexec/zmmsgtrace -r '@gmail.com' 
+
+If you have multiple log files, using '/var/log/zimbra*' will search all of the log files in that directory:
+
+/opt/zimbra/libexec/zmmsgtrace -r '@gmail.com' /var/log/zimbra*
+
+
+
+Creating Persona:Fisrt  run below command
+Format:
+zmprov ma userID +zimbraAllowFromAddress GroupID
+Ex:
+zmprov ma rajesh.rochlani@njcb.in +zimbraAllowFromAddress cpcloan@njcb.in
+
+
+
+
+Exim>>
+###mailq
+  exim -bp
+
+Firewall Entry:
+
+Firewall Rules
+/var/ipcop/portfw/config
+
+
+For specific network/ip:
+58,0,tcp,2087,10.30.10.41,2087,on,103.239.139.41,0,DNS-I2K2SYSTEM- SQL
+58,1,tcp,0,10.30.10.41,2087,on,0,103.25.129.30/255.255.255.255,DNS-I2K2SYSTEM
+58,2,tcp,0,10.30.10.41,2087,on,0,180.179.201.0/255.255.255.0,DNS-I2K2SYSTEM
+58,3,tcp,0,10.30.10.41,2087,on,0,103.25.130.253/255.255.255.0,DNS-I2K2SYSTEM
+
+
+
+
+Snat Entry
+/etc/rc.d/rc.firewall
+
+                /sbin/iptables -t nat -A REDNAT -s 10.30.1.21 -o $IFACE -j SNAT --to-source 103.239.139.125
+
+
+Alias
+/var/ipcop/ethernet
+103.239.139.175,on,ZIMBRANE006-MUM
+
+to restart firewall service:
+/etc/rc.d/rc.network
+
+
+
+
+Open Source Edition:
+https://www.zimbra.com/downloads/zimbra-collaboration-open-source/archives/
+	
+
+Network Edition:
+https://www.zimbra.com/downloads/zimbra-collaboration/archives/
+
+
+migration From gmail to zimbra:
+imapsync --buffersize 8192000 --nosyncacls --subscribe --sep1 / --prefix1 --syncinternaldates --host1 imap.gmail.com --ssl1 --authmech1 LOGIN --user1 adesh.kumar@vservit.com --password1 aadesh99 --host2 10.10.1.27 --user2 adesh.kumar@vservit.com --authuser2 admin@zimbra027-ind.megavelocity.net --password2 'g24gas%I?1024?' --ssl2--split1 100 --split2 100 --exclude All Mail --useheader 'Message-Id'
+
+
+Exim:
+ 222  2017-12-04 16:09:20 exim -bpc
+  223  2017-12-04 16:09:23 df -h
+  224  2017-12-04 16:32:04 exim -bpc
+  225  2017-12-13 16:12:42 cd
+  226  2017-12-13 16:12:47 exim -bpc
+  227  2017-12-13 16:12:57 history 
+  228  2017-12-13 16:13:21 history | grep cwd
+  229  2017-12-13 16:13:34 exim -bp
+  230  2017-12-13 16:16:22 awk '$3 ~ /^cwd/{print $3}' /var/log/exim_mainlog | sort | uniq -c | sort -nr
+  231  2017-12-13 16:23:11 curl ipinfo.io
+  232  2018-01-21 11:07:26 ip r
+  233  2018-01-21 11:07:36 curl ident.me
+  234  2018-01-21 11:07:45 exim -bp
+
+  247  2018-01-21 11:37:04 mailq
+  248  2018-01-21 11:37:19 exim -bp |nl
+  249  2018-01-21 11:51:56 /usr/sbin/exim -bpr | grep “<” | wc -l 
+  250  2018-01-21 11:52:16 /usr/sbin/exim -bp | wc -l 
+
+  252  2018-01-21 11:53:15 /usr/sbin/exim -bpr | grep frozen | wc -l
+  253  2018-01-21 11:59:28 grep sasl_user /var/log/maillog | sed 's/.*sasl_username=//g' | sort | uniq -c | sort -nr | head 
+
+  256  2018-01-21 12:04:02 exim -bp | less
+  257  2018-01-21 12:04:30 exim -Mvh 1eYONF-00020h-Ja
+  258  2018-01-21 12:05:24 /scripts/whoowns uif.com.hk
+  259  2018-01-21 12:06:25 grep '<d6c8641b2f84271cdc7eb3f6dc433a34@coscosh.com>' /var/log/exim_mainlog
+  260  2018-01-21 12:06:29 grep '<d6c8641b2f84271cdc7eb3f6dc433a34@coscosh.com>' /var/log/exim_mainlog*
+  261  2018-01-21 12:07:03 grep AABPGD6W7AR7SDQJ /var/log/exim_mainlog
+  262  2018-01-21 12:07:08 exim -bpc
+  263  2018-01-21 12:08:03 exim -bp | less
+  264  2018-01-21 12:10:35 tailf /var/log/exim_mainlog
+  265  2018-01-21 12:11:43 /scripts/whoowns hanjin.com
+  266  2018-01-21 12:14:45 /scripts/whoowns 123gifts.xyz
+  267  2018-01-21 12:18:00 exim -bp | grep eepl.com 
+  268  2018-01-21 12:18:36 exim -bp | grep eurekasoft.in 
+  269  2018-01-21 12:18:55 exim -bp | grep landmarkcrafts.in 
+  270  2018-01-21 12:19:28 exim -bp | grep logisticlinkage.com 
+  271  2018-01-21 12:19:55 exim -Mvh 1ed6qh-0004Wh-6m
+  272  2018-01-21 12:20:44 /scripts/whoowns logisticlinkage.com
+  273  2018-01-21 12:21:18 grep logistic /home/logistic/public_html/ /var/log/exim_mainlog
+  274  2018-01-21 12:22:36 grep logistic /var/log/exim_mainlog /home/logistic/public_html/
+
+  282  2018-01-21 12:27:21 find /home/ -name default.php
+  283  2018-01-21 12:27:59 cat /home/eurekaso/public_html/cgi-bin/opencart-1.5.6.1/upload/admin/language/english/extension/default.php | less
+  284  2018-01-21 12:28:23 cat /home/landmark/public_html/wp-content/plugins/woocommerce/includes/admin/importers/mappings/default.php | less
+  285  2018-01-21 12:28:52 cat /home/landmark/.trash/wp-content.1/plugins/woocommerce/includes/admin/importers/mappings/default.php | less
+
+[root@lserver22135 public_html]# 
+FTp logs download and upload files:>>>root@lserver228 [/usr/local]# grep  pure-ftpd   /var/log/messages-20180311 |grep 'Mar  9'  > /tmp/ftp_loggs
+
+*****SPF record 
+
+g24gas%I?115$$209?
+
+**************
+How to create Zadmin account on shared server for specific domain>>>>>
+
+Checking by CLI if the archive is enabled per account
+$zmprov ga userb@example.com | grep -i archive
+Searching logs:
+$grep -B 3 gma@dwdspl.com  /var/log/zimbra.log  finding source ip  source Ip
+
+FORWARDING:
+zmprov ma Fromaccountname@domain.com zimbraPrefMailForwardingAddress Toyourid@yahoo.com
+Toconfirm:
+ zmprov ga raghvendra.sharma@mylearningcube.com  |grep zimbraPrefMailForwardingAddress
+
+To check zimbra License:
+[zimbra@zimbrane013-ind ~]$ zmlicense -c
+license is expired
+
+To use of Screen :
+start a new screen session with session name 	screen -S <name>
+list running sessions/screens 	screen -ls
+attach to a running session 	screen -r
+to session with name 	screen -r <name>
+
+CSF:
+Check CSF for Your IP Address
+
+Let’s say that you want to check whether or not a specific IP address, maybe 8.8.8.8 , is blocked by CSF. That’s easy!
+
+csf -g 8.8.8.8
+
+Unblock an IP Address
+
+If the IP address is denied in CSF and you want to remove it, then use this command:
+
+csf -dr 8.8.8.8
+
+CSF then needs to be restarted for the change to take effect:
+
+csf -r
+
+
+Deleting local failure message
+zmmailbox -z -m kamal.kumar@carnivalcinemas.in deleteMessage 8693
+
+zmmailbox -z -m kamal.kumar@carnivalcinemas.in s -t message -l 50 "in:inbox date:02/05/2018"
+
+
+
